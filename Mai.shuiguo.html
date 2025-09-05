@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pinyin Fruit Slice - Đã chỉnh sửa</title>
+  <style>
+    /* CSS giữ nguyên như trước */
+    :root {
+      --bg1: #071025;
+      --bg2: #0b1220;
+      --card: #0f172a;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --muted: #9ca3af;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans SC", "Microsoft YaHei", sans-serif;
+    }
+    html,body { 
+      height: 100%; 
+      margin: 0; 
+      background: linear-gradient(180deg,var(--bg1),var(--bg2)); 
+      display:flex; 
+      align-items:center;
+      justify-content:center; 
+      color: #e6eef8;
+    }
+    .wrap { 
+      width: min(1100px, 96vw);
+      height: min(820px, 92vh); 
+      background: linear-gradient(180deg,#0f172a,#111827); 
+      border-radius:18px; 
+      box-shadow: 0 10px 30px rgba(2,6,23,.7); 
+      padding:16px;
+      position:relative; 
+      overflow:hidden; 
+      display: flex;
+      flex-direction: column;
+    }
+    header { 
+      display:flex; 
+      justify-content:space-between; 
+      align-items:center; 
+      padding: 0 10px;
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+    .title { 
+      font-weight:700; 
+      font-size:18px;
+    }
+    .controls { 
+      display:flex; 
+      gap:8px; 
+      align-items:center;
+    }
+    button { 
+      background:#10b981; 
+      color:white; 
+      border:0; 
+      padding:8px 14px; 
+      border-radius:12px; 
+      cursor:pointer; 
+      font-weight:600;
+      transition: all 0.2s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    button.ghost { 
+      background:#334155;
+    }
+    button.danger {
+      background: var(--danger);
+    }
+    button.warning {
+      background: var(--warning);
+    }
+    .stats-container {
+      display: flex;
+      justify-content: space-between;
+      padding: 0 15px;
+      margin-bottom: 10px;
+      flex-shrink: 0;
+    }
+    .stats-left, .stats-right {
+      display: flex;
+      gap: 12px;
+    }
+    .stat-item { 
+      background:rgba(255,255,255,0.04); 
+      padding:8px 12px; 
+      border-radius:8px; 
+      font-weight:600; 
+      font-size:14px;
+    }
+    .canvas-container {
+      flex: 1;
+      position: relative;
+      border-radius:12px; 
+      overflow:hidden; 
+      background: rgba(0,0,0,0.2);
+    }
+    canvas { 
+      width:100%; 
+      height:100%; 
+      display:block; 
+      cursor: pointer;
+    }
+    .overlay { 
+      position:absolute; 
+      inset:0; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center;
+      background:rgba(0,0,0,0.55); 
+      z-index:50;
+      backdrop-filter: blur(4px); 
+      padding: 20px;
+    }
+    .panel { 
+      background:rgba(7,10,25,0.9); 
+      padding:24px; 
+      border-radius:12px; 
+      color:#f8fafc;
+      max-width:700px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .panel h2 { 
+      margin:0 0 15px 0;
+      font-size:22px; 
+      color: #fef08a;
+    }
+    .panel ul { 
+      margin:8px 0 0 18px;
+      color:#cbd5e1; 
+    }
+    .settings-group {
+      margin: 15px 0;
+      padding: 15px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+    }
+    .settings-row { 
+      display: flex; 
+      align-items: center; 
+      gap: 12px;
+      margin: 12px 0; 
+    }
+    .settings-label { 
+      min-width: 160px; 
+      font-weight: 500;
+    }
+    input[type="number"], input[type="text"] { 
+      padding: 8px 12px; 
+      border-radius:6px;
+      border: 1px solid #334155; 
+      background: #1e293b; 
+      color: white; 
+      width: 80px;
+    }
+    .game-mode { 
+      display: flex; 
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 15px 0; 
+    }
+    .game-mode label { 
+      display: flex; 
+      align-items: center;
+      gap: 6px; 
+      cursor: pointer; 
+      padding: 8px 12px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+    .game-mode label:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    textarea { 
+      width: 100%; 
+      height: 120px; 
+      padding: 12px; 
+      border-radius:8px;
+      border: 1px solid #334155; 
+      background: #1e293b; 
+      color: white; 
+      margin: 10px 0;
+      resize: vertical;
+    }
+    .format-hint { 
+      color: var(--muted); 
+      font-size:13px; 
+      margin-bottom:10px;
+    }
+    .completed { 
+      position:absolute; 
+      inset:0; 
+      display:flex; 
+      align-items:center; 
+      justify-content:center;
+      z-index:60; 
+      background:rgba(0,0,0,0.6); 
+      color:white;
+    }
+    .completed-content {
+      text-align:center; 
+      max-width: 90%; 
+      background: rgba(7,10,25,0.95);
+      padding: 30px;
+      border-radius: 12px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .completed-title {
+      font-size:28px; 
+      font-weight:800; 
+      margin-bottom:15px;
+      color: #fef08a;
+    }
+    .completed-stats {
+      font-size:18px; 
+      margin-bottom:20px;
+    }
+    .word-review { 
+      margin-top: 20px; 
+      text-align: left; 
+      max-height: 300px; 
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    .word-review h3 { 
+      margin: 15px 0 10px 0;
+      color: #fef08a; 
+      font-size: 18px; 
+    }
+    .word-item { 
+      display: flex; 
+      justify-content: space-between;
+      padding: 10px 15px; 
+      margin: 8px 0; 
+      background: rgba(255,255,255,0.05); 
+      border-radius: 8px; 
+      align-items: center;
+    }
+    .word-hanzi { 
+      font-weight: bold; 
+      font-size: 16px; 
+      min-width: 80px;
+    }
+    .word-pinyin { 
+      color: #86efac; 
+      min-width: 120px;
+    }
+    .word-vietnamese { 
+      color: #93c5fd; 
+      flex: 1;
+      word-break: break-word;
+      max-width: 200px;
+    }
+    .incorrect { 
+      border-left: 4px solid #ef4444;
+    }
+    .missed { 
+      border-left: 4px solid #f59e0b;
+    }
+    .hint { 
+      color:var(--muted); 
+      font-size:13px; 
+      margin-top:10px; 
+      text-align:center; 
+      padding: 0 10px;
+    }
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .debug-info {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.5);
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      color: #fff;
+    }
+    @media (max-width:700px) {
+      .panel { 
+        font-size:14px;
+        padding:16px; 
+      }
+      button { 
+        padding:8px 10px;
+      }
+      .settings-row { 
+        flex-direction: column; 
+        align-items: flex-start;
+        gap: 6px;
+      }
+      .stats-container {
+        flex-direction: column;
+        gap: 8px;
+      }
+      .stats-left, .stats-right {
+        justify-content: space-between;
+        width: 100%;
+      }
+      .word-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+      }
+      .word-hanzi, .word-pinyin, .word-vietnamese {
+        min-width: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" role="application" aria-label="Pinyin Fruit Slice - Đã chỉnh sửa">
+    <header>
+      <div class="title">Pinyin Fruit Slice - Đã chỉnh sửa</div>
+      <div class="controls">
+        <button id="btnStart">Bắt đầu</button>
+        <button id="btnHelp" class="ghost">Hướng dẫn</button>
+        <button id="btnReplay" class="warning" style="display:none;">Chơi lại</button>
+      </div>
+    </header>
+
+    <div class="stats-container">
+      <div class="stats-left">
+        <div class="stat-item" id="score">Điểm: 0</div>
+        <div class="stat-item" id="round">Lượt: 0/0</div>
+      </div>
+      <div class="stats-right">
+        <div class="stat-item" id="lives">Mạng: 3</div>
+        <div class="stat-item" id="playerNameDisplay">Người chơi: ...</div>
+      </div>
+    </div>
+
+    <div class="canvas-container">
+      <canvas id="gameCanvas"></canvas>
+      <div class="debug-info" id="debugInfo">Chế độ: Chờ bắt đầu</div>
+    </div>
+
+    <div id="helpOverlay" class="overlay" style="display:flex;">
+      <div class="panel">
+        <h2>Hướng dẫn & Cài đặt trò chơi</h2>
+        
+        <div class="settings-group">
+          <div class="settings-row">
+            <div class="settings-label">Tên người chơi:</div>
+            <input type="text" id="playerName" placeholder="Nhập tên của bạn" value="Người chơi">
+          </div>
+       
+          <div class="settings-row">
+            <div class="settings-label">Thời gian rơi của quả (giây):</div>
+            <input type="number" id="fruitTime" min="5" max="30" value="10">
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <div class="settings-label">Chế độ chơi:</div>
+          <div class="game-mode">
+            <label><input type="radio" name="gameMode" value="hanzi-pinyin" checked> Hiện chữ Hán - Chém Pinyin</label>
+            <label><input type="radio" name="gameMode" value="hanzi-vietnamese"> Hiện chữ Hán - Chém Tiếng Việt</label>
+            <label><input type="radio" name="gameMode" value="vietnamese-hanzi"> Hiện Tiếng Việt - Chém chữ Hán</label>
+          </div>
+        </div>
+        
+        <div class="settings-group">
+          <div>Nhập từ vựng của bạn (mỗi dòng một từ, định dạng: 汉字-pinyin-tiếng Việt):</div>
+          <textarea id="customWords" placeholder="空巢-kōng cháo-nhà trống
+bảo đảm-bǎo zhàng-bảo đảm
+照料-zhào liào-chăm sóc
+tinh thần-jīng shén-tinh thần
+ngày càng-rì yì-ngày càng
+chấm dứt-zhōng zhǐ-chấm dứt">空巢-kōng cháo-nhà trống
+bảo đảm-bǎo zhàng-bảo đảm
+照料-zhào liào-chăm sóc
+tinh thần-jīng shén-tinh thần
+ngày càng-rì yì-ngày càng
+chấm dứt-zhōng zhǐ-chấm dứt</textarea>
+          <div class="format-hint">Định dạng: [Chữ Hán]-[Pinyin]-[Nghĩa tiếng Việt]</div>
+          <div class="action-buttons">
+            <button id="saveWords">Lưu từ vựng</button>
+            <button id="resetWords" class="ghost">Mặc định</button>
+          </div>
+        </div>
+        
+        <div class="settings-group">
+          <h3>Hướng dẫn chơi:</h3>
+          <ul>
+            <li>Một từ sẽ xuất hiện ở trên cùng; nhiệm vụ: <strong>chém quả có đáp án đúng</strong> theo chế độ chơi.</li>
+            <li>Mỗi lượt có 4 quả (1 đúng + 3 mồi). Quả rơi trong thời gian đã đặt. Kéo chuột/vuốt để chém.</li>
+            <li>Chém đúng: +10 điểm, hiệu ứng ✓ xanh; chém sai: ✗ đỏ, mất 1 mạng.</li>
+            <li>Hết mạng → game over.</li>
+          </ul>
+        </div>
+        
+        <div class="action-buttons">
+          <button id="helpClose">Bắt đầu chơi</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="completedPanel" class="completed" style="display:none;">
+      <div class="completed-content">
+        <div class="completed-title">Hoàn thành!</div>
+        <div class="completed-stats">Người chơi: <span id="finalPlayerName" style="color:#34d399"></span></div>
+        <div class="completed-stats">Tổng điểm: <span id="finalScore" style="color:#34d399"></span></div>
+        
+        <div id="reviewSection" class="word-review">
+          </div>
+        
+        <div class="action-buttons">
+          <button id="replayBtn">Chơi lại</button>
+          <button id="newWordsBtn" class="ghost">Từ vựng mới</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="hint">Làm theo nhịp: chém chính xác đáp án theo chế độ chơi.
+(Dùng chuột hoặc cảm ứng)</div>
+  </div>
+
+<script>
+// --------------------- Word list ---------------------
+let WORDS = [
+  { hanzi: "空巢", pinyin: "kōng cháo", vietnamese: "nhà trống" },
+  { hanzi: "保障", pinyin: "bǎo zhàng", vietnamese: "bảo đảm" },
+  { hanzi: "照料", pinyin: "zhào liào", vietnamese: "chăm sóc" },
+  { hanzi: "tinh thần", pinyin: "jīng shén", vietnamese: "tinh thần" },
+  { hanzi: "ngày càng", pinyin: "rì yì", vietnamese: "ngày càng" },
+  { hanzi: "chấm dứt", pinyin: "zhōng zhǐ", vietnamese: "chấm dứt" }
+];
+// --------------------- Helpers ---------------------
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// --------------------- Game ---------------------
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+let W = 800, H = 500;
+
+function resizeCanvas(){
+  const parent = canvas.parentElement;
+  W = parent.clientWidth; 
+  H = parent.clientHeight;
+  canvas.width = W;
+  canvas.height = H;
+}
+
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
+
+// sprites
+const SPRITES = [];
+function createFruitSprite(type, size=140){
+  const c = document.createElement('canvas'); 
+  c.width = c.height = size;
+  const g = c.getContext('2d');
+  const cx = size/2, cy = size/2;
+  // Bảng màu mới cho 4 loại quả
+  const palette = ['#ff4444', '#f59e0b', '#10b981', '#6366f1'];
+  const color = palette[type % palette.length];
+  
+  // Tạo quả hình cầu tròn, không viền
+  const grad = g.createRadialGradient(cx - size*0.1, cy - size*0.1, size*0.05, cx, cy, size*0.5);
+  grad.addColorStop(0, '#ffffffaa'); 
+  grad.addColorStop(0.7, color);
+  grad.addColorStop(1, color + 'cc');
+  
+  g.fillStyle = grad; 
+  g.beginPath();
+  g.arc(cx, cy, size*0.45, 0, Math.PI*2); 
+  g.fill();
+  
+  // Thêm lá xanh đậm, không viền
+  g.fillStyle = '#166534';
+  g.beginPath(); 
+  g.moveTo(cx+size*0.25, cy-size*0.3);
+  g.quadraticCurveTo(cx+size*0.05, cy-size*0.5, cx-size*0.05, cy-size*0.25);
+  g.quadraticCurveTo(cx+size*0.08, cy-size*0.15, cx+size*0.25, cy-size*0.3); 
+  g.fill();
+  
+  // Thêm điểm sáng
+  g.fillStyle = 'rgba(255,255,255,0.6)'; 
+  g.beginPath(); 
+  g.arc(cx-size*0.15, cy-size*0.15, size*0.08, 0, Math.PI*2); 
+  g.fill();
+  
+  return c;
+}
+
+for (let i=0; i<4; i++) {
+  SPRITES.push(createFruitSprite(i, 160));
+}
+
+// state
+let runOrder = shuffle(WORDS);
+let roundIndex = 0;
+let currentTarget = null;
+let fruits = [], effects = [], particles = [];
+let score = 0, lives = 3, running = false;
+let blade = {x:0, y:0, px:0, py:0, active:false, trail:[]};
+let roundTimer = null;
+let incorrectWords = [];
+let missedWords = [];
+let playerName = "Người chơi";
+let fruitTime = 10;
+let gameMode = "hanzi-pinyin";
+let roundStartTime = 0;
+let correctFruitSliced = false;
+
+// DOM elements
+const btnStart = document.getElementById('btnStart');
+const btnHelp = document.getElementById('btnHelp');
+const helpOverlay = document.getElementById('helpOverlay');
+const helpClose = document.getElementById('helpClose');
+const btnReplay = document.getElementById('btnReplay');
+const completedPanel = document.getElementById('completedPanel');
+const finalScoreEl = document.getElementById('finalScore');
+const finalPlayerNameEl = document.getElementById('finalPlayerName');
+const replayBtn = document.getElementById('replayBtn');
+const newWordsBtn = document.getElementById('newWordsBtn');
+const scoreEl = document.getElementById('score');
+const roundEl = document.getElementById('round');
+const livesEl = document.getElementById('lives');
+const playerNameInput = document.getElementById('playerName');
+const playerNameDisplay = document.getElementById('playerNameDisplay');
+const fruitTimeInput = document.getElementById('fruitTime');
+const customWordsInput = document.getElementById('customWords');
+const saveWordsBtn = document.getElementById('saveWords');
+const resetWordsBtn = document.getElementById('resetWords');
+const reviewSection = document.getElementById('reviewSection');
+const gameModeRadios = document.querySelectorAll('input[name="gameMode"]');
+const debugInfo = document.getElementById('debugInfo');
+
+// Load saved words from localStorage
+function loadSavedWords() {
+  const savedWords = localStorage.getItem('pinyinGameWords');
+  if (savedWords) {
+    customWordsInput.value = savedWords;
+    parseCustomWords();
+  }
+  
+  const savedName = localStorage.getItem('pinyinGamePlayerName');
+  if (savedName) {
+    playerNameInput.value = savedName;
+    playerName = savedName;
+    playerNameDisplay.textContent = `Người chơi: ${playerName}`;
+  }
+  
+  const savedTime = localStorage.getItem('pinyinGameFruitTime');
+  if (savedTime) {
+    fruitTimeInput.value = savedTime;
+    fruitTime = parseInt(savedTime);
+  }
+  
+  const savedMode = localStorage.getItem('pinyinGameMode');
+  if (savedMode) {
+    gameMode = savedMode;
+    document.querySelector(`input[name="gameMode"][value="${savedMode}"]`).checked = true;
+  }
+}
+
+// Parse custom words from textarea
+function parseCustomWords() {
+  const text = customWordsInput.value.trim();
+  if (!text) return;
+  
+  const lines = text.split('\n');
+  const newWords = [];
+  
+  for (const line of lines) {
+    const trimmedLine = line.trim();
+    if (!trimmedLine) continue;
+    
+    // Split by dash
+    const parts = trimmedLine.split('-');
+    if (parts.length < 3) continue;
+    
+    const hanzi = parts[0];
+    const pinyin = parts[1];
+    const vietnamese = parts.slice(2).join('-');
+    
+    newWords.push({ hanzi, pinyin, vietnamese });
+  }
+  
+  if (newWords.length > 0) {
+    WORDS = newWords;
+  }
+}
+
+// Save custom words
+saveWordsBtn.addEventListener('click', () => {
+  localStorage.setItem('pinyinGameWords', customWordsInput.value);
+  localStorage.setItem('pinyinGamePlayerName', playerNameInput.value);
+  localStorage.setItem('pinyinGameFruitTime', fruitTimeInput.value);
+  
+  const selectedMode = document.querySelector('input[name="gameMode"]:checked').value;
+  localStorage.setItem('pinyinGameMode', selectedMode);
+  
+  playerName = playerNameInput.value || "Người chơi";
+  playerNameDisplay.textContent = `Người chơi: ${playerName}`;
+  fruitTime = parseInt(fruitTimeInput.value);
+  gameMode = selectedMode;
+  
+  parseCustomWords();
+  alert(`Đã lưu cài đặt! Số từ vựng: ${WORDS.length}`);
+});
+// Reset to default words
+resetWordsBtn.addEventListener('click', () => {
+  const defaultWords = [
+    "空巢-kōng cháo-nhà trống",
+    "bảo đảm-bǎo zhàng-bảo đảm",
+    "照料-zhào liào-chăm sóc",
+    "tinh thần-jīng shén-tinh thần",
+    "ngày càng-rì yì-ngày càng",
+    "chấm dứt-zhōng zhǐ-chấm dứt"
+  ].join('\n');
+  
+  customWordsInput.value = defaultWords;
+  parseCustomWords();
+  alert("Đã khôi phục từ vựng mặc định!");
+});
+// Hiển thị tổng kết từ sai và bỏ lỡ
+function showReview() {
+  let reviewHTML = '';
+  if (incorrectWords.length > 0) {
+    reviewHTML += '<h3>📝 Từ bạn chọn sai:</h3>';
+    incorrectWords.forEach(word => {
+      reviewHTML += `
+        <div class="word-item incorrect">
+          <span class="word-hanzi">${word.hanzi}</span>
+          <span class="word-pinyin">${word.pinyin}</span>
+          <span class="word-vietnamese">${word.vietnamese}</span>
+        </div>
+      `;
+    });
+  }
+  
+  if (missedWords.length > 0) {
+    reviewHTML += '<h3>⏰ Từ bạn bỏ lỡ:</h3>';
+    missedWords.forEach(word => {
+      reviewHTML += `
+        <div class="word-item missed">
+          <span class="word-hanzi">${word.hanzi}</span>
+          <span class="word-pinyin">${word.pinyin}</span>
+          <span class="word-vietnamese">${word.vietnamese}</span>
+        </div>
+      `;
+    });
+  }
+  
+  if (incorrectWords.length === 0 && missedWords.length === 0) {
+    reviewHTML += '<h3>🎉 Tuyệt vời! Bạn không mắc lỗi nào!</h3>';
+  }
+  
+  reviewSection.innerHTML = reviewHTML;
+}
+
+// Event listeners
+btnHelp.addEventListener('click', () => helpOverlay.style.display = 'flex');
+helpClose.addEventListener('click', () => {
+  helpOverlay.style.display = 'none';
+  startGame();
+});
+btnStart.addEventListener('click', () => startGame());
+btnReplay.addEventListener('click', () => startGame());
+replayBtn.addEventListener('click', () => startGame());
+newWordsBtn.addEventListener('click', () => {
+  completedPanel.style.display = 'none';
+  helpOverlay.style.display = 'flex';
+});
+function makeDistractors(correctAnswer, allWords, mode) {
+  const distractors = [];
+  const usedAnswers = new Set([correctAnswer]);
+  // Lấy các đáp án từ các từ khác trong danh sách
+  for (const word of allWords) {
+    if (distractors.length >= 3) break;
+    let candidate;
+    if (mode === "hanzi-pinyin") {
+      candidate = word.pinyin;
+    } else if (mode === "hanzi-vietnamese") {
+      candidate = word.vietnamese;
+    } else if (mode === "vietnamese-hanzi") {
+      candidate = word.hanzi;
+    }
+    
+    if (!usedAnswers.has(candidate)) {
+      distractors.push(candidate);
+      usedAnswers.add(candidate);
+    }
+  }
+  
+  // Nếu không đủ 3 distractors, thêm các giá trị mặc định
+  while (distractors.length < 3) {
+    let candidate;
+    if (mode === "hanzi-pinyin") {
+      candidate = "pīnyīn " + (distractors.length + 1);
+    } else if (mode === "hanzi-vietnamese") {
+      candidate = "nghĩa " + (distractors.length + 1);
+    } else if (mode === "vietnamese-hanzi") {
+      candidate = "汉字" + (distractors.length + 1);
+    }
+    
+    if (!usedAnswers.has(candidate)) {
+      distractors.push(candidate);
+      usedAnswers.add(candidate);
+    }
+  }
+  
+  return distractors;
+}
+
+function playSound(ok) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); 
+    g.connect(ctx.destination);
+    o.type = ok ? 'sine' : 'square';
+    o.frequency.value = ok ? 900 : 160;
+    g.gain.value = 0.0001;
+    o.start();
+    const t0 = ctx.currentTime;
+    g.gain.exponentialRampToValueAtTime(ok ? 0.25 : 0.18, t0 + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.25);
+    o.stop(t0 + 0.26);
+  } catch (e) { }
+}
+
+function spawnBatch(target) {
+  const radius = Math.max(30, Math.floor(W/20));
+  // Tính toán tốc độ rơi dựa trên thời gian rơi và chiều cao màn hình
+  const totalDistance = H + radius * 2;
+  const vy = totalDistance / fruitTime;
+  
+  let correctAnswer = "";
+  if (gameMode === "hanzi-pinyin") {
+    correctAnswer = target.pinyin;
+  } else if (gameMode === "hanzi-vietnamese") {
+    correctAnswer = target.vietnamese;
+  } else if (gameMode === "vietnamese-hanzi") {
+    correctAnswer = target.hanzi;
+  }
+  
+  const distractors = makeDistractors(correctAnswer, WORDS, gameMode);
+  const labels = shuffle([correctAnswer, ...distractors]);
+  
+  const positions = [];
+  const minGap = radius * 2.4;
+  
+  for (let i=0; i<labels.length; i++) {
+    let x = 0, tries = 0;
+    do { 
+      x = radius + Math.random()*(W-2*radius); 
+      tries++; 
+      if (tries > 200) break;
+    } while (positions.some(px => Math.abs(px-x) < minGap));
+    
+    positions.push(x);
+  }
+  
+  fruits = labels.map((label, idx) => ({
+    id: Date.now() + idx,
+    x: positions[idx] || radius + idx*(radius*2+10),
+    y: -radius - idx*radius*1.2,
+    r: radius,
+    vy,
+    label,
+    correct: label === correctAnswer,
+    alive: true,
+    // Chỉ sử dụng 4 sprite
+    sprite: SPRITES[idx]
+  }));
+  roundStartTime = performance.now();
+  correctFruitSliced = false;
+  debugInfo.textContent = `Chế độ: ${gameMode} | Quả: ${fruits.length} | Tốc độ: ${vy.toFixed(1)} px/s`;
+}
+
+// next round
+function nextRound() {
+  roundIndex++;
+  if (roundIndex >= runOrder.length) { 
+    endGame(); 
+    return;
+  }
+  
+  currentTarget = runOrder[roundIndex];
+  spawnBatch(currentTarget);
+  updateHUD();
+}
+
+// start/end game
+function startGame() {
+  runOrder = shuffle(WORDS);
+  roundIndex = 0; 
+  incorrectWords = [];
+  missedWords = [];
+  
+  if (runOrder.length > 0) {
+    currentTarget = runOrder[0];
+  } else {
+    alert('Vui lòng nhập ít nhất một từ vựng!');
+    helpOverlay.style.display = 'flex';
+    return;
+  }
+  
+  fruits = []; 
+  effects = []; 
+  particles = [];
+  score = 0; 
+  lives = 3;
+  running = true;
+  correctFruitSliced = false;
+  
+  spawnBatch(currentTarget);
+  helpOverlay.style.display = 'none';
+  btnReplay.style.display = 'none';
+  completedPanel.style.display = 'none';
+  updateHUD();
+  requestAnimationFrame(loop);
+}
+
+function endGame() {
+  running = false;
+  finalScoreEl.textContent = score;
+  finalPlayerNameEl.textContent = playerName;
+  completedPanel.style.display = 'flex';
+  btnReplay.style.display = 'inline-block';
+  for (let i = roundIndex; i < runOrder.length; i++) {
+    if (!missedWords.some(w => w.hanzi === runOrder[i].hanzi)) {
+      missedWords.push(runOrder[i]);
+    }
+  }
+  
+  showReview();
+  updateHUD();
+}
+
+// HUD
+function updateHUD() {
+  scoreEl.textContent = 'Điểm: ' + score;
+  roundEl.textContent = 'Lượt: ' + (roundIndex+1) + '/' + runOrder.length;
+  livesEl.textContent = 'Mạng: ' + lives;
+  playerNameDisplay.textContent = 'Người chơi: ' + playerName;
+}
+
+// slice detection
+function segmentIntersectsCircle(x1, y1, x2, y2, cx, cy, r) {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const fx = x1 - cx;
+  const fy = y1 - cy;
+  const a = dx * dx + dy * dy;
+  const b = 2 * (fx * dx + fy * dy);
+  const c = fx * fx + fy * fy - r * r;
+  const discriminant = b * b - 4 * a * c;
+  
+  if (discriminant < 0) return false;
+  const t1 = (-b - Math.sqrt(discriminant)) / (2 * a);
+  const t2 = (-b + Math.sqrt(discriminant)) / (2 * a);
+  return (t1 >= 0 && t1 <= 1) || (t2 >= 0 && t2 <= 1);
+}
+
+function createBurst(x, y, color='#fff') {
+  for (let i=0; i<15; i++) { 
+    particles.push({
+      x, y,
+      vx: (Math.random()-0.5)*160,
+      vy: (Math.random()-0.8)*160,
+      life: 0.6 + Math.random()*0.4,
+      color
+    });
+  }
+}
+
+// input handling
+function getCanvasMousePos(canvas, evt) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: evt.clientX - rect.left,
+    y: evt.clientY - rect.top
+  };
+}
+
+function getCanvasTouchPos(canvas, evt) {
+  const rect = canvas.getBoundingClientRect();
+  const touch = evt.touches[0];
+  return {
+    x: touch.clientX - rect.left,
+    y: touch.clientY - rect.top
+  };
+}
+
+// Xử lý sự kiện chuột
+canvas.addEventListener('mousedown', (e) => {
+  const pos = getCanvasMousePos(canvas, e);
+  blade.x = pos.x; blade.y = pos.y;
+  blade.px = pos.x; blade.py = pos.y;
+  blade.active = true;
+  blade.trail = [{x: pos.x, y: pos.y}];
+});
+canvas.addEventListener('mousemove', (e) => {
+  if (!blade.active) return;
+  const pos = getCanvasMousePos(canvas, e);
+  blade.x = pos.x; blade.y = pos.y;
+  blade.trail.push({x: pos.x, y: pos.y});
+  if (blade.trail.length > 10) blade.trail.shift();
+});
+canvas.addEventListener('mouseup', () => {
+  blade.active = false;
+  blade.trail = [];
+});
+canvas.addEventListener('mouseleave', () => {
+  blade.active = false;
+  blade.trail = [];
+});
+// Xử lý sự kiện cảm ứng
+canvas.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  const pos = getCanvasTouchPos(canvas, e);
+  blade.x = pos.x; blade.y = pos.y;
+  blade.px = pos.x; blade.py = pos.y;
+  blade.active = true;
+  blade.trail = [{x: pos.x, y: pos.y}];
+});
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  if (!blade.active) return;
+  const pos = getCanvasTouchPos(canvas, e);
+  blade.x = pos.x; blade.y = pos.y;
+  blade.trail.push({x: pos.x, y: pos.y});
+  if (blade.trail.length > 10) blade.trail.shift();
+});
+canvas.addEventListener('touchend', (e) => {
+  e.preventDefault();
+  blade.active = false;
+  blade.trail = [];
+});
+canvas.addEventListener('touchcancel', (e) => {
+  e.preventDefault();
+  blade.active = false;
+  blade.trail = [];
+});
+// main loop
+function loop(t) {
+  if (!running) return;
+  
+  resizeCanvas();
+  ctx.clearRect(0, 0, W, H);
+  // Update fruits
+  let allDead = true;
+  let allMissed = true;
+  for (const fruit of fruits) {
+    if (!fruit.alive) continue;
+    
+    allDead = false;
+    fruit.y += fruit.vy / 60;
+    // Kiểm tra nếu quả vẫn còn trên màn hình
+    if (fruit.y - fruit.r < H) {
+      allMissed = false;
+    }
+    
+    // Kiểm tra nếu quả chạm đáy
+    if (fruit.y > H + fruit.r) {
+      fruit.alive = false;
+      if (fruit.correct && !correctFruitSliced) {
+        missedWords.push(currentTarget);
+      }
+    }
+  }
+  
+  // Kiểm tra thời gian
+  const elapsed = (performance.now() - roundStartTime) / 1000;
+  const timeUp = elapsed >= fruitTime;
+  
+  // Nếu hết thời gian hoặc tất cả quả đã chết/bị bỏ lỡ, chuyển sang lượt tiếp theo
+  if ((timeUp || allDead || allMissed) && !correctFruitSliced) {
+    if (timeUp && currentTarget && !missedWords.some(w => w.hanzi === currentTarget.hanzi)) {
+      missedWords.push(currentTarget);
+    }
+    nextRound();
+    requestAnimationFrame(loop);
+    return;
+  }
+  
+  // Blade collision detection
+  if (blade.active && blade.trail.length > 1) {
+    for (let i = 1; i < blade.trail.length; i++) {
+      const prev = blade.trail[i-1];
+      const curr = blade.trail[i];
+      
+      for (const fruit of fruits) {
+        if (!fruit.alive) continue;
+        if (segmentIntersectsCircle(prev.x, prev.y, curr.x, curr.y, fruit.x, fruit.y, fruit.r)) {
+          fruit.alive = false;
+          createBurst(fruit.x, fruit.y, fruit.correct ? '#10b981' : '#ef4444');
+          
+          if (fruit.correct) {
+            score += 10;
+            correctFruitSliced = true;
+            effects.push({
+              x: fruit.x, y: fruit.y,
+              text: '✓ +10',
+              color: '#10b981',
+              life: 1.0
+            });
+            playSound(true);
+            
+            // Tự động chuyển sang lượt tiếp theo sau 0.5 giây
+            setTimeout(() => {
+              if (running) nextRound();
+            }, 500);
+          } else {
+            lives--;
+            if (currentTarget && !incorrectWords.some(w => w.hanzi === currentTarget.hanzi)) {
+              incorrectWords.push(currentTarget);
+            }
+            effects.push({
+              x: fruit.x, y: fruit.y,
+              text: '✗ -1 mạng',
+              color: '#ef4444',
+              life: 1.0
+            });
+            playSound(false);
+            
+            if (lives <= 0) {
+              endGame();
+              return;
+            }
+          }
+          
+          updateHUD();
+        }
+      }
+    }
+  }
+  
+  // Draw target
+  if (currentTarget) {
+    let targetText = "";
+    if (gameMode === "hanzi-pinyin" || gameMode === "hanzi-vietnamese") {
+      targetText = currentTarget.hanzi;
+    } else if (gameMode === "vietnamese-hanzi") {
+      targetText = currentTarget.vietnamese;
+    }
+    
+    ctx.font = 'bold 28px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#fef08a';
+    ctx.fillText(targetText, W/2, 40);
+    
+    // Hiển thị thời gian còn lại
+    const remaining = Math.max(0, fruitTime - elapsed);
+    ctx.font = 'bold 18px system-ui';
+    ctx.fillStyle = remaining < 3 ? '#ef4444' : '#86efac';
+    ctx.fillText(`⏱️ ${remaining.toFixed(1)}s`, W/2, 70);
+  }
+  
+  // Draw fruits
+  for (const fruit of fruits) {
+    if (!fruit.alive) continue;
+    // Draw sprite
+    ctx.drawImage(
+      fruit.sprite, 
+      fruit.x - fruit.r, 
+      fruit.y - fruit.r, 
+      fruit.r*2, 
+      fruit.r*2
+    );
+    // Draw label - ĐÃ CHỈNH SỬA: Tăng kích thước chữ, thêm viền đen mảnh
+    ctx.font = 'bold ' + (fruit.r*0.4) + 'px system-ui';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    // Xử lý chữ quá dài
+    const label = fruit.label;
+    
+    ctx.lineWidth = 2.5; // TĂNG ĐỘ DÀY VIỀN
+    ctx.strokeStyle = '#000000'; // Màu viền đen
+    ctx.fillStyle = '#ffffff'; // Màu chữ trắng
+
+    // Tìm điểm ngắt dòng tốt nhất
+    const words = label.split(' ');
+    let line1 = '';
+    let line2 = '';
+
+    if (words.length > 1) {
+        const midIndex = Math.floor(words.length / 2);
+        line1 = words.slice(0, midIndex).join(' ');
+        line2 = words.slice(midIndex).join(' ');
+    } else {
+        // Nếu chỉ có một từ, kiểm tra độ dài
+        if (label.length > 10) {
+            const midChar = Math.floor(label.length / 2);
+            line1 = label.substring(0, midChar);
+            line2 = label.substring(midChar);
+        } else {
+            line1 = label;
+        }
+    }
+    
+    if (line2) {
+      // TĂNG KHOẢNG CÁCH GIỮA HAI DÒNG
+      ctx.strokeText(line1, fruit.x, fruit.y - fruit.r * 0.25);
+      ctx.fillText(line1, fruit.x, fruit.y - fruit.r * 0.25);
+      
+      ctx.strokeText(line2, fruit.x, fruit.y + fruit.r * 0.25);
+      ctx.fillText(line2, fruit.x, fruit.y + fruit.r * 0.25);
+    } else {
+      ctx.strokeText(line1, fruit.x, fruit.y);
+      ctx.fillText(line1, fruit.x, fruit.y);
+    }
+  }
+  
+  // Draw blade
+  if (blade.active && blade.trail.length > 1) {
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = '#ffffffcc';
+    ctx.beginPath();
+    ctx.moveTo(blade.trail[0].x, blade.trail[0].y);
+    for (let i=1; i<blade.trail.length; i++) {
+      ctx.lineTo(blade.trail[i].x, blade.trail[i].y);
+    }
+    ctx.stroke();
+  }
+  
+  // Draw effects
+  for (let i=effects.length-1; i>=0; i--) {
+    const fx = effects[i];
+    fx.life -= 0.016;
+    if (fx.life <= 0) {
+      effects.splice(i, 1);
+      continue;
+    }
+    ctx.font = 'bold 24px system-ui';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = fx.color;
+    ctx.globalAlpha = fx.life;
+    ctx.fillText(fx.text, fx.x, fx.y - fx.life*40);
+    ctx.globalAlpha = 1;
+  }
+  
+  // Draw particles
+  for (let i=particles.length-1; i>=0; i--) {
+    const p = particles[i];
+    p.life -= 0.016;
+    if (p.life <= 0) {
+      particles.splice(i, 1);
+      continue;
+    }
+    p.x += p.vx * 0.016;
+    p.y += p.vy * 0.016;
+    ctx.globalAlpha = p.life;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 2, 0, Math.PI*2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+  // Draw lives
+  for (let i=0; i<lives; i++) {
+    ctx.fillStyle = '#ef4444';
+    ctx.beginPath();
+    ctx.arc(W - 20 - i*30, 20, 8, 0, Math.PI*2);
+    ctx.fill();
+  }
+  
+  requestAnimationFrame(loop);
+}
+
+// Initialize
+window.addEventListener('load', () => {
+  loadSavedWords();
+  resizeCanvas();
+  
+  // Preload sprites
+  setTimeout(() => {
+    if (SPRITES.length === 0) {
+      for (let i=0; i<4; i++) {
+        SPRITES.push(createFruitSprite(i, 160));
+      }
+    }
+  }, 100);
+});
+</script>
+</body>
+</html>
